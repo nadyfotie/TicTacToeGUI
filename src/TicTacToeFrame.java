@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 
 public class TicTacToeFrame extends JFrame {
@@ -8,6 +9,7 @@ public class TicTacToeFrame extends JFrame {
         private String player = "X";
         private int moveCnt = 0;
         private static final int MOVES_FOR_WIN = 5;
+        private static final int MOVES_FOR_TIE = 7;
         private String[][] gameBoard;
 
 
@@ -21,12 +23,15 @@ public class TicTacToeFrame extends JFrame {
             boardPanel.setLayout(new GridLayout(3, 3));
             gameBoard = new String[3][3];
 
+            // One listener shared by all 9 tiles. The tile that was clicked tells us its row and col.
+            ActionListener tileListener = e -> handleTileClick((TicTacToeTile) e.getSource());
+
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 3; col++) {
                     board[row][col] = new TicTacToeTile(row, col);
                     board[row][col].setText(" ");
                     gameBoard[row][col] = " ";
-                    board[row][col].addActionListener(e -> handleTileClick((TicTacToeTile) e.getSource()));
+                    board[row][col].addActionListener(tileListener);
                     boardPanel.add(board[row][col]);
                 }
             }
@@ -77,7 +82,7 @@ public class TicTacToeFrame extends JFrame {
                    return;
                 }
             }
-            if (moveCnt >= 7 && isTie()){
+            if (moveCnt >= MOVES_FOR_TIE && isTie()){
                 disableBoard();
                 JOptionPane.showMessageDialog(this, "its a tie");
                 int choice = JOptionPane.showConfirmDialog(this, "Would you like to play another game",
