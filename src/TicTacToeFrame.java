@@ -1,8 +1,8 @@
 import javax.swing.*;
-import java.awt.GridLayout;
+import java.awt.*;
 
 
-    public class TicTacToeFrame extends JFrame {
+public class TicTacToeFrame extends JFrame {
         private TicTacToeTile[][] board;
         private JPanel boardPanel;
         private String player = "X";
@@ -32,9 +32,25 @@ import java.awt.GridLayout;
             }
 
             add(boardPanel);
+            JButton quitButtom = new JButton("Quit");
+            quitButtom.addActionListener(e -> quitGame());
+            add(quitButtom, BorderLayout.SOUTH);
             setVisible(true);
 
         }
+
+        private void quitGame() {
+            int choice = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to quit?",
+                    "Quit",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (choice == JOptionPane.YES_OPTION) {
+                dispose();
+            }
+        }
+
         private void handleTileClick(TicTacToeTile tile) {
             int row = tile.getRow();
             int col = tile.getCol();
@@ -47,10 +63,32 @@ import java.awt.GridLayout;
             moveCnt++;
             if (moveCnt >= MOVES_FOR_WIN) {
                 if (isWin(player)) {
+                    disableBoard();
                     JOptionPane.showMessageDialog(this,
                             "Player " + player + " wins!");
-                    return;
+                   int choice = JOptionPane.showConfirmDialog(this, "Would you like to play another game",
+                           "Play again", JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        resetBoard();
+                    }
+                    else{
+                        dispose();
+                    }
+                   return;
                 }
+            }
+            if (moveCnt >= 7 && isTie()){
+                disableBoard();
+                JOptionPane.showMessageDialog(this, "its a tie");
+                int choice = JOptionPane.showConfirmDialog(this, "Would you like to play another game",
+                        "Play again", JOptionPane.YES_NO_OPTION);
+                if  (choice == JOptionPane.YES_OPTION) {
+                    resetBoard();
+                }
+                else{
+                    dispose();
+                }
+                return;
             }
             if (player.equals("X")) {
                 player = "O";
@@ -58,6 +96,19 @@ import java.awt.GridLayout;
                 player = "X";
             }
 
+
+
+        }
+        private void resetBoard(){
+            player = "X";
+            moveCnt = 0;
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 3; col++) {
+                    gameBoard[row][col] = " ";
+                    board[row][col].setText(" ");
+                    board[row][col].setEnabled(true);
+                }
+            }
         }
         private boolean isWin(String player) {
             if (isColWin(player) || isRowWin(player) || isDiagnalWin(player)) {
@@ -65,6 +116,15 @@ import java.awt.GridLayout;
             }
             return false;
         }
+
+        private void disableBoard(){
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 3; col++) {
+                    board[row][col].setEnabled(false);
+                }
+            }
+        }
+
         private boolean isColWin(String player) {
             for (int col = 0; col < 3; col++) {
                 if (gameBoard[0][col].equals(player) &&
@@ -100,6 +160,76 @@ import java.awt.GridLayout;
 
             return false;
         }
+        private boolean isTie() {
+            boolean hasX;
+            boolean hasO;
 
+            for (int row = 0; row < 3; row++) {
+                hasX = false;
+                hasO = false;
+                for (int col = 0; col < 3; col++) {
+                    if (gameBoard[row][col].equals("X")) {
+                        hasX = true;
+                    }
+                    if (gameBoard[row][col].equals("O")) {
+                        hasO = true;
+                    }
+                }
+                if (!(hasX && hasO)) {
+                    return false;
+                }
+            }
+
+            // checking the tie with the columns.
+            for (int col = 0; col < 3; col++) {
+                hasX = false;
+                hasO = false;
+                for (int row = 0; row < 3; row++) {
+                    if (gameBoard[row][col].equals("X")) {
+                        hasX = true;
+                    }
+                    if (gameBoard[row][col].equals("O")) {
+                        hasO = true;
+                    }
+                }
+                if (!(hasX && hasO)) {
+                    return false;
+                }
+            }
+            // check tie for diagonal top left to right
+            hasX = false;
+            hasO = false;
+
+            for (int i = 0; i < 3; i++) {
+                if (gameBoard[i][i].equals("X")) {
+                    hasX = true;
+                }
+                if (gameBoard[i][i].equals("O")) {
+                    hasO = true;
+
+                }
+            }
+            if (!(hasX && hasO)) {
+                return false;
+
+            }
+            // checking for diogonal tie from bottom left to right
+            hasX = false;
+            hasO = false;
+
+            for (int i = 0; i < 3; i++) {
+                if (gameBoard[i][2 - i].equals("X")) {
+                    hasX = true;
+                }
+                if (gameBoard[i][2 - i].equals("O")) {
+                    hasO = true;
+                }
+            }
+            if (!(hasX && hasO)) {
+                return false;
+            }
+            return true;
+
+        }
 
 }
